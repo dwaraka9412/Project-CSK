@@ -1,0 +1,12 @@
+{
+  "name": "project-csk",
+  "version": "1.0.0",
+  "description": "Simple login project",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
