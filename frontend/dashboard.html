@@ -1,13 +1,71 @@
 <!DOCTYPE html>
 <html>
-<body style="text-align:center;margin-top:100px;">
+<head>
+<style>
+body {
+  margin:0;
+  font-family: Arial;
+  background: linear-gradient(135deg,#1a1a2e,#16213e);
+  color:white;
+}
 
-<h2>Dashboard 🎉</h2>
+.container {
+  display:flex;
+}
+
+.sidebar {
+  width:250px;
+  height:100vh;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(15px);
+  padding:20px;
+}
+
+.main {
+  flex:1;
+  padding:40px;
+}
+
+.upload-box {
+  border:2px dashed #00c6ff;
+  padding:50px;
+  text-align:center;
+  border-radius:20px;
+}
+
+button {
+  margin-top:20px;
+  padding:10px 20px;
+  border:none;
+  border-radius:10px;
+  background:#00c6ff;
+  color:white;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="sidebar">
+<h2>Project CSK ⚡</h2>
+<p>Dashboard</p>
+</div>
+
+<div class="main">
+<h1>Upload Files 📂</h1>
 
 <form action="/upload" method="POST" enctype="multipart/form-data">
-  <input type="file" name="file" required><br><br>
-  <button>Upload File</button>
+<div class="upload-box">
+<input type="file" name="file" required>
+<br>
+<button>Upload</button>
+</div>
 </form>
+
+</div>
+
+</div>
 
 </body>
 </html>

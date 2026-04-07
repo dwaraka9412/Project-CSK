@@ -1,17 +1,74 @@
 <!DOCTYPE html>
 <html>
+<head>
+<title>Login</title>
+<style>
+body {
+  margin:0;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background: radial-gradient(circle at top left, #1a1a2e, #0f3460);
+  font-family: 'Segoe UI';
+}
+
+.card {
+  backdrop-filter: blur(20px);
+  background: rgba(255,255,255,0.08);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow:
+    10px 10px 30px rgba(0,0,0,0.5),
+    -5px -5px 15px rgba(255,255,255,0.05);
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(145deg,#00c6ff,#0072ff);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 5px 5px 15px rgba(0,0,0,0.4);
+  transition: all 0.2s ease;
+}
+
+button:active {
+  transform: scale(0.96);
+  box-shadow: inset 5px 5px 10px rgba(0,0,0,0.5);
+}
+
+a {
+  color: #00c6ff;
+}
+</style>
+</head>
 <body>
 
-<h2>Login</h2>
+<div class="card">
+<h2>Login 🔐</h2>
 
 <form action="/login" method="POST">
-  <input type="email" name="email" placeholder="Email" required><br><br>
-  <input type="password" name="password" placeholder="Password" required><br><br>
-  <button type="submit">Login</button>
+<input type="email" name="email" placeholder="Email" required>
+<input type="password" name="password" placeholder="Password" required>
+<button>Login</button>
 </form>
 
 <br>
 <a href="/register">New user? Register</a>
+</div>
 
 </body>
 </html>
