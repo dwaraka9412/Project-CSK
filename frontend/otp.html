@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<body style="text-align:center;margin-top:100px;">
+
+<h2>Enter OTP 🔐</h2>
+
+<form action="/verify-otp" method="POST">
+  <input name="email" id="email" hidden>
+  <input name="otp" placeholder="Enter OTP" required><br><br>
+  <button>Verify</button>
+</form>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+document.getElementById("email").value = params.get("email");
+</script>
+
+</body>
+</html>
