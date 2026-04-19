@@ -1,71 +1,170 @@
 <!DOCTYPE html>
 <html>
 <head>
+<title>Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
 body {
   margin:0;
-  font-family: Arial;
-  background: linear-gradient(135deg,#1a1a2e,#16213e);
+  font-family: 'Segoe UI';
+  background: linear-gradient(135deg,#141e30,#243b55);
   color:white;
 }
 
-.container {
-  display:flex;
-}
+.container { padding:20px; }
 
-.sidebar {
-  width:250px;
-  height:100vh;
-  background: rgba(255,255,255,0.05);
+.card {
+  background: rgba(255,255,255,0.08);
   backdrop-filter: blur(15px);
+  border-radius:15px;
   padding:20px;
-}
-
-.main {
-  flex:1;
-  padding:40px;
-}
-
-.upload-box {
-  border:2px dashed #00c6ff;
-  padding:50px;
-  text-align:center;
-  border-radius:20px;
+  margin:10px 0;
 }
 
 button {
-  margin-top:20px;
-  padding:10px 20px;
+  padding:8px 12px;
   border:none;
-  border-radius:10px;
+  border-radius:8px;
   background:#00c6ff;
   color:white;
+  cursor:pointer;
+  margin-left:10px;
+}
+
+a {
+  color:#00c6ff;
+  margin-left:10px;
+  text-decoration:none;
 }
 </style>
 </head>
-<body>
 
+<body>
 <div class="container">
 
-<div class="sidebar">
-<h2>Project CSK ⚡</h2>
-<p>Dashboard</p>
+<h2>Welcome 🚀</h2>
+
+<div class="card">
+  <h3>User Info</h3>
+  <p id="email"></p>
 </div>
 
-<div class="main">
-<h1>Upload Files 📂</h1>
-
-<form action="/upload" method="POST" enctype="multipart/form-data">
-<div class="upload-box">
-<input type="file" name="file" required>
-<br>
-<button>Upload</button>
-</div>
-</form>
-
+<div class="card">
+  <h3>Upload File</h3>
+  <form action="/upload" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="email" id="uploadEmail">
+    <input type="file" name="file" required>
+    <br><br>
+    <button type="submit">Upload</button>
+  </form>
 </div>
 
+<div class="card">
+  <h3>Your Files</h3>
+  <ul id="fileList"></ul>
 </div>
+
+<button onclick="logout()">Logout</button>
+
+</div>
+
+<script>
+
+// ================= SESSION =================
+const params = new URLSearchParams(window.location.search);
+let email = params.get("email");
+
+if (email) localStorage.setItem("email", email);
+email = localStorage.getItem("email");
+
+if (!email) {
+  alert("Session expired");
+  window.location.href = "/";
+}
+
+document.getElementById("email").innerText = "Email: " + email;
+document.getElementById("uploadEmail").value = email;
+
+
+// ================= LOAD FILES =================
+async function loadFiles() {
+  const res = await fetch(`/files/${email}`);
+  const files = await res.json();
+
+  const list = document.getElementById("fileList");
+  list.innerHTML = "";
+
+  if (!files.length) {
+    list.innerHTML = "<li>No files uploaded</li>";
+    return;
+  }
+
+  files.forEach(file => {
+
+    // 🔥 FIX: Proper view URL
+    let viewLink;
+
+    if (file.resource_type === "raw") {
+      // PDF, TXT → force inline preview
+      viewLink = file.url.replace("/upload/", "/upload/fl_inline/");
+    } else {
+      // Images
+      viewLink = file.url;
+    }
+
+    const li = document.createElement("li");
+
+    li.innerHTML = `
+      <b>📄 ${file.name}</b>
+
+      <a href="/view?url=${file.url}&name=${file.name}" target="_blank">View</a>
+
+      <a href="/download?url=${file.url}&name=${file.name}">Download</a>
+
+      <button onclick="deleteFile('${file.public_id}', '${file.resource_type}')">
+        Delete
+      </button>
+    `;
+
+    list.appendChild(li);
+  });
+}
+
+
+// ================= DELETE =================
+async function deleteFile(public_id, resource_type) {
+
+  const res = await fetch("/delete-file", {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      email,
+      public_id,
+      resource_type
+    })
+  });
+
+  const msg = await res.text();
+  console.log(msg);
+
+  loadFiles();
+}
+
+
+// ================= LOGOUT =================
+function logout(){
+  localStorage.clear();
+  window.location.href="/";
+}
+
+
+// ================= INIT =================
+window.onload = loadFiles;
+
+</script>
 
 </body>
 </html>

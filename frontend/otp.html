@@ -3,6 +3,7 @@
 <head>
 <title>OTP Verification</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
 body {
   margin:0;
@@ -21,14 +22,7 @@ body {
   background: rgba(255,255,255,0.07);
   padding: 35px;
   border-radius: 20px;
-  box-shadow:
-    10px 10px 30px rgba(0,0,0,0.6),
-    -5px -5px 20px rgba(255,255,255,0.04);
   text-align: center;
-}
-
-h2 {
-  margin-bottom: 20px;
 }
 
 input {
@@ -45,10 +39,6 @@ input {
   color: white;
 }
 
-input:focus {
-  box-shadow: 0 0 12px #00c6ff;
-}
-
 button {
   width: 100%;
   padding: 12px;
@@ -58,14 +48,13 @@ button {
   color: white;
   font-weight: bold;
   cursor: pointer;
-  box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
-  transition: all 0.2s ease;
 }
 
-button:active {
-  transform: scale(0.95);
+.message {
+  margin-top:10px;
+  font-size:14px;
+  color: #ffcccb;
 }
-
 </style>
 </head>
 
@@ -74,16 +63,74 @@ button:active {
 <div class="card">
   <h2>Verify OTP 🔐</h2>
 
-  <form action="/verify-otp" method="POST">
-    <input type="hidden" name="email" id="email">
-    <input type="text" name="otp" placeholder="Enter 6-digit OTP" maxlength="6" required>
-    <button type="submit">Verify</button>
+  <form id="otpForm">
+    <input type="hidden" id="email">
+    <input type="text" id="otp" placeholder="Enter OTP" required>
+    <button id="btn">Verify</button>
   </form>
+
+  <p id="msg" class="message"></p>
 </div>
 
 <script>
+// ================= GET PARAMS =================
 const params = new URLSearchParams(window.location.search);
-document.getElementById("email").value = params.get("email");
+
+let email = params.get("email");
+const type = params.get("type");
+
+const msg = document.getElementById("msg");
+
+// Normalize email
+if (email) email = email.trim().toLowerCase();
+
+// Validation
+if (!email || !type) {
+  msg.innerText = "Invalid access. Please login again ❌";
+  throw new Error("Missing email/type");
+}
+
+// Set hidden email
+document.getElementById("email").value = email;
+
+
+// ================= SUBMIT =================
+document.getElementById("otpForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const btn = document.getElementById("btn");
+  const otp = document.getElementById("otp").value;
+
+  btn.innerText = "Verifying...";
+  btn.disabled = true;
+  msg.innerText = "";
+
+  try {
+    const res = await fetch("/verify-otp", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ email, otp })
+    });
+
+    // 🔥 Handle redirect FIRST
+    if (res.redirected) {
+      window.location.href = res.url;
+      return;
+    }
+
+    const text = await res.text();
+    msg.innerText = text;
+
+  } catch (err) {
+    msg.innerText = "Something went wrong ❌";
+    console.error(err);
+  }
+
+  btn.innerText = "Verify";
+  btn.disabled = false;
+});
 </script>
 
 </body>

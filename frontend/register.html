@@ -3,6 +3,7 @@
 <head>
 <title>Register</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
 body {
   margin:0;
@@ -27,10 +28,6 @@ body {
   text-align: center;
 }
 
-h2 {
-  margin-bottom: 20px;
-}
-
 input {
   width: 100%;
   padding: 12px;
@@ -42,10 +39,6 @@ input {
   color: white;
 }
 
-input::placeholder {
-  color: #ddd;
-}
-
 button {
   width: 100%;
   padding: 12px;
@@ -55,13 +48,16 @@ button {
   color: white;
   font-weight: bold;
   cursor: pointer;
-  box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
-  transition: all 0.2s ease;
 }
 
-button:active {
-  transform: scale(0.95);
-  box-shadow: inset 5px 5px 10px rgba(0,0,0,0.6);
+.message {
+  margin-top:10px;
+  font-size:14px;
+  color:#ffcccb;
+}
+
+.success {
+  color:#90ee90;
 }
 
 a {
@@ -76,16 +72,76 @@ a {
 <div class="card">
   <h2>Create Account 🚀</h2>
 
-  <form action="/register" method="POST">
-    <input type="text" name="name" placeholder="Full Name" required>
-    <input type="email" name="email" placeholder="Email Address" required>
-    <input type="password" name="password" placeholder="Password" required>
-    <button type="submit">Register</button>
+  <form id="registerForm">
+    <input type="text" id="name" placeholder="Full Name" required>
+    <input type="email" id="email" placeholder="Email Address" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button id="btn">Register</button>
   </form>
+
+  <p id="msg" class="message"></p>
 
   <br>
   <a href="/">Already have an account? Login</a>
 </div>
+
+<script>
+const form = document.getElementById("registerForm");
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const btn = document.getElementById("btn");
+  const msg = document.getElementById("msg");
+
+  let name = document.getElementById("name").value;
+  let email = document.getElementById("email").value;
+  let password = document.getElementById("password").value;
+
+  email = email.trim().toLowerCase();
+
+  msg.classList.remove("success");
+
+  if (password.length < 6) {
+    msg.innerText = "Password must be at least 6 characters ❌";
+    return;
+  }
+
+  btn.innerText = "Creating Account...";
+  btn.disabled = true;
+  msg.innerText = "";
+
+  try {
+    const res = await fetch("/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ name, email, password })
+    });
+
+    const text = await res.text();
+
+    if (res.status === 201) {
+      msg.innerText = "Registration successful ✅ Redirecting...";
+      msg.classList.add("success");
+
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 1500);
+    } else {
+      msg.innerText = text;
+    }
+
+  } catch (err) {
+    msg.innerText = "Something went wrong ❌";
+    console.error(err);
+  }
+
+  btn.innerText = "Register";
+  btn.disabled = false;
+});
+</script>
 
 </body>
 </html>
